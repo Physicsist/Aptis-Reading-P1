@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Luyện Aptis Reading P1</title>
+    <style>
+        :root {
+            --navy-dark: #0a192f;
+            --navy-main: #112240;
+            --navy-light: #233554;
+            --accent: #3b82f6;
+            --white: #ffffff;
+            --bg-light: #f1f5f9;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --correct: #10b981;
+            --correct-bg: #d1fae5;
+            --wrong: #ef4444;
+            --wrong-bg: #fee2e2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--navy-dark);
+            color: var(--white);
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .timer-badge {
+            background-color: var(--navy-light);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--navy-light);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--correct);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Controls Bar */
+        .controls-bar {
+            background-color: var(--navy-main);
+            color: var(--white);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .btn-small {
+            background-color: var(--navy-light);
+            color: var(--white);
+            border: 1px solid #334155;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-small.active {
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            padding: 16px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Quiz Card */
+        .quiz-card {
+            background-color: var(--white);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(10, 25, 47, 0.06);
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .q-badge {
+            background-color: var(--navy-dark);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .sr-tag {
+            background-color: #fef3c7;
+            color: #d97706;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .speak-btn {
+            background-color: #eff6ff;
+            color: var(--accent);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .speak-btn:active {
+            transform: scale(0.92);
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.5;
+            color: var(--navy-dark);
+            margin-bottom: 20px;
+        }
+
+        .blank-highlight {
+            color: var(--accent);
+            text-decoration: underline;
+            font-weight: 700;
+            padding: 0 4px;
+        }
+
+        /* Options */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background-color: var(--white);
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--navy-main);
+            background-color: #f8fafc;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: scale(0.99);
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct);
+            color: #065f46;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong);
+            color: #991b1b;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        /* Feedback Box */
+        .feedback-card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 5px solid var(--navy-dark);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feedback-exp {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .next-btn {
+            background-color: var(--navy-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(10, 25, 47, 0.2);
+            display: none;
+            margin-top: auto;
+        }
+
+        .next-btn:active {
+            background-color: var(--navy-main);
+        }
+
+        /* Modal Danh sách câu hỏi */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 25, 47, 0.75);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--navy-dark);
+            color: var(--white);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+            gap: 8px;
+        }
+
+        .q-grid-btn {
+            padding: 10px 4px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: var(--white);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .q-grid-btn.mastered {
+            background: var(--correct-bg);
+            border-color: var(--correct);
+            color: #065f46;
+        }
+
+        .q-grid-btn.wrong-hist {
+            background: var(--wrong-bg);
+            border-color: var(--wrong);
+            color: #991b1b;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <h1>Luyện Aptis Reading P1</h1>
+            <div class="timer-badge">
+                <span>⏱️</span>
+                <span id="timer">00:00</span>
+            </div>
+        </div>
+        <div class="stats-bar">
+            <span>Đã thuộc: <strong id="mastered-count">0</strong>/143</span>
+            <span>Hàng đợi ôn: <strong id="queue-count">143</strong></span>
+            <span>Cần ôn lại: <strong id="wrong-count">0</strong></span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </header>
+
+    <div class="controls-bar">
+        <div style="display: flex; gap: 6px;">
+            <button class="btn-small" id="btn-list" onclick="openListModal()">📋 Danh sách (143)</button>
+            <button class="btn-small" id="btn-filter-wrong" onclick="toggleWrongOnlyMode()">🔄 Ôn câu sai</button>
+        </div>
+        <div style="display: flex; gap: 6px;">
+            <button class="btn-small active" id="btn-auto-audio" onclick="toggleAutoAudio()">🔊 Tự đọc: BẬT</button>
+            <button class="btn-small" onclick="resetProgress()" title="Xóa tiến độ làm lại từ đầu">🗑️ Reset</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="quiz-card" id="quiz-card">
+            <div class="question-meta">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span class="q-badge" id="q-number">Câu 1/143</span>
+                    <span class="sr-tag" id="sr-tag">🔁 Lặp lại câu sai</span>
+                </div>
+                <button class="speak-btn" onclick="speakCurrentQuestion()" title="Nghe phát âm">🔊</button>
+            </div>
+
+            <div class="question-text" id="q-text">
+                Loading...
+            </div>
+
+            <div class="options-list" id="options-list"></div>
+        </div>
+
+        <div class="feedback-card" id="feedback-card">
+            <div class="feedback-title" id="feedback-title"></div>
+            <div class="feedback-exp" id="feedback-exp"></div>
+        </div>
+
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Câu tiếp theo ➔</button>
+    </main>
+
+    <!-- Modal Danh sách 143 câu -->
+    <div class="modal-overlay" id="list-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Chọn câu hỏi (Xanh: Đã thuộc | Đỏ: Từng sai)</span>
+                <button class="close-modal" onclick="closeListModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // DỮ LIỆU 143 CÂU HỎI TỪ FILE PDF APTIS ESOL PART 1
+        const QUESTIONS_DB = [
+            { id: 1, q: "Take the bus to the main ______.", options: ["station", "run", "walk"], ans: "station", exp: "'main station' (nhà ga chính). Dịch: Hãy bắt xe buýt đến nhà ga chính." },
+            { id: 2, q: "I saw some shoes in the ______ of one store.", options: ["market", "window", "shoe"], ans: "window", exp: "'store window' (tủ kính trưng bày của cửa hàng). Dịch: Tôi đã thấy vài đôi giày trong tủ kính của một cửa hàng." },
+            { id: 3, q: "I get up early in the ______ and I go running.", options: ["morning", "friends", "leave"], ans: "morning", exp: "'in the morning' (vào buổi sáng). Dịch: Tôi thức dậy sớm vào buổi sáng và đi chạy bộ." },
+            { id: 4, q: "Everyone is ______.", options: ["friendly", "melty", "noisy"], ans: "friendly", exp: "'friendly' (thân thiện - mang nghĩa tích cực chuẩn Aptis). Dịch: Mọi người đều thân thiện." },
+            { id: 5, q: "I start ______ in the morning.", options: ["sleep", "early", "angry"], ans: "early", exp: "'start early' (bắt đầu sớm). Dịch: Tôi bắt đầu công việc sớm vào buổi sáng." },
+            { id: 6, q: "The ______ is out.", options: ["wind", "dust", "sun"], ans: "sun", exp: "Cụm 'The sun is out' (Trời hửng nắng / Mặt trời đã lên)." },
+            { id: 7, q: "I just reviewed the latest report, but the budget doesn't ______.", options: ["work", "count", "balance"], ans: "balance", exp: "'the budget doesn't balance' (ngân sách không cân đối). Dịch: Tôi vừa xem báo cáo mới nhất, nhưng ngân sách không cân đối." },
+            { id: 8, q: "In the mornings, I attend ______.", options: ["meetings", "dinner", "breakfast"], ans: "meetings", exp: "'attend meetings' (tham dự các cuộc họp). Dịch: Vào buổi sáng, tôi tham dự các cuộc họp." },
+            { id: 9, q: "The weather is ______.", options: ["cheap", "expensive", "great"], ans: "great", exp: "Thời tiết thì dùng tính từ 'great' (tuyệt vời). Dịch: Thời tiết rất tuyệt." },
+            { id: 10, q: "I need the ______ of the report.", options: ["work", "job", "details"], ans: "details", exp: "'details of the report' (chi tiết của bản báo cáo). Dịch: Tôi cần thông tin chi tiết của bản báo cáo." },
+            { id: 11, q: "I ______ in a flat.", options: ["go", "live", "walk"], ans: "live", exp: "'live in a flat' (sống trong một căn hộ). Dịch: Tôi sống trong một căn hộ." },
+            { id: 12, q: "I am living with a family ______ the city.", options: ["next", "near", "under"], ans: "near", exp: "'near the city' (gần thành phố). 'next' phải có 'to'. Dịch: Tôi đang sống cùng một gia đình gần thành phố." },
+            { id: 13, q: "The water is ______.", options: ["sour", "clear", "see"], ans: "clear", exp: "'clear' (trong vắt). Dịch: Nước rất trong." },
+            { id: 14, q: "It is ______ what I like.", options: ["yet", "not", "just"], ans: "just", exp: "'just what I like' (đúng thứ tôi thích). Dịch: Đó chính xác là những gì tôi thích." },
+            { id: 15, q: "I am never ______.", options: ["late", "soon", "early"], ans: "late", exp: "'never late' (không bao giờ trễ). Dịch: Tôi không bao giờ đi trễ." },
+            { id: 16, q: "I am writing to tell you about my ______.", options: ["stay", "dinner", "garden"], ans: "stay", exp: "'my stay' (kỳ lưu trú/chuyến đi ở lại của tôi). Dịch: Tôi viết thư để kể cho bạn nghe về kỳ lưu trú của tôi." },
+            { id: 17, q: "The library is ______ today, so we can study there after class.", options: ["open", "heavy", "green"], ans: "open", exp: "'open' (mở cửa). Dịch: Hôm nay thư viện mở cửa, nên chúng ta có thể học ở đó sau giờ học." },
+            { id: 18, q: "I imagine you don't want to ______ this.", options: ["love", "remember", "miss"], ans: "miss", exp: "'miss this' (bỏ lỡ điều này). Dịch: Tôi đoán là bạn không muốn bỏ lỡ điều này đâu." },
+            { id: 19, q: "In the ______, I cycle to work.", options: ["sun", "morning", "market"], ans: "morning", exp: "'In the morning' (Vào buổi sáng, tôi đạp xe đi làm). Lưu ý: File gốc bị dư chữ 'market' do lỗi gõ máy." },
+            { id: 20, q: "The bus ______ are near my house.", options: ["color", "stops", "driver"], ans: "stops", exp: "'bus stops' (các trạm xe buýt - số nhiều đi với 'are'). Dịch: Các trạm xe buýt ở gần nhà tôi." },
+            { id: 21, q: "I didn't ______ it.", options: ["eat", "drink", "buy"], ans: "buy", exp: "Đáp án chuẩn theo bộ đề Aptis: 'buy' (Tôi đã không mua nó)." },
+            { id: 22, q: "My ______ come and exercise with me.", options: ["friends", "leave", "food"], ans: "friends", exp: "Chủ ngữ chỉ người thực hiện hành động 'exercise': 'friends' (Bạn bè tôi đến và tập thể dục cùng tôi)." },
+            { id: 23, q: "My flat is near university, so I can ______ to my class.", options: ["train", "sleep", "walk"], ans: "walk", exp: "'walk to my class' (đi bộ đến lớp). Dịch: Căn hộ của tôi gần trường đại học nên tôi có thể đi bộ đến lớp." },
+            { id: 24, q: "I have ______.", options: ["lunch", "bed", "tutor"], ans: "lunch", exp: "Cụm 'have lunch' (ăn trưa)." },
+            { id: 25, q: "I have an ______ holiday.", options: ["tired", "enjoyable", "good"], ans: "enjoyable", exp: "Sau mạo từ 'an' cần tính từ bắt đầu bằng nguyên âm (u, e, o, a, i) -> 'enjoyable' (thú vị)." },
+            { id: 26, q: "I ______ you earlier but you were not home.", options: ["called", "told", "said"], ans: "called", exp: "'called you' (đã gọi điện cho bạn). Dịch: Tôi đã gọi cho bạn lúc nãy nhưng bạn không có ở nhà." },
+            { id: 27, q: "Could you get the financial ______ and check for any errors?", options: ["department", "statement", "accountant"], ans: "statement", exp: "'financial statement' (báo cáo tài chính). Dịch: Bạn có thể lấy bản báo cáo tài chính và kiểm tra lỗi không?" },
+            { id: 28, q: "I eat lunch in the ______.", options: ["park", "city", "village"], ans: "park", exp: "'in the park' (trong công viên). Dịch: Tôi ăn trưa ở trong công viên." },
+            { id: 29, q: "We are on the ______.", options: ["city", "countryside", "boat"], ans: "boat", exp: "'on the boat' (ở trên thuyền). City và countryside dùng giới từ 'in'." },
+            { id: 30, q: "Can you print a ______ for me?", options: ["information", "copy", "paper"], ans: "copy", exp: "'print a copy' (in một bản sao). Information và paper (giấy) không đếm được với 'a'." },
+            { id: 31, q: "I ______ it with my friend.", options: ["share", "drink", "hold"], ans: "share", exp: "Cấu trúc 'share something with somebody' (chia sẻ cái gì với ai)." },
+            { id: 32, q: "My flat is near the university, so I can ______ to my class.", options: ["train", "sleep", "walk"], ans: "walk", exp: "'walk to my class' (đi bộ đến lớp học)." },
+            { id: 33, q: "I live ______ the city.", options: ["near", "next", "far"], ans: "near", exp: "'near the city' (gần thành phố). 'next' cần 'to', 'far' cần 'from'." },
+            { id: 34, q: "My teacher asked me to ______ the email before lunch.", options: ["send", "grow", "paint"], ans: "send", exp: "'send the email' (gửi email). Dịch: Giáo viên yêu cầu tôi gửi email trước bữa trưa." },
+            { id: 35, q: "My ______ cycle to work.", options: ["friends", "house", "car"], ans: "friends", exp: "'friends' (bạn bè tôi đạp xe đi làm)." },
+            { id: 36, q: "My house is ______ and you can easily recognize it by the color.", options: ["tall", "fat", "green"], ans: "green", exp: "Có gợi ý 'recognize it by the color' (nhận ra bởi màu sắc) -> chọn 'green' (màu xanh lá)." },
+            { id: 37, q: "I ______ a program on TV.", options: ["ate", "saw", "watched"], ans: "watched", exp: "Xem TV dùng động từ 'watch' -> 'watched a program on TV'." },
+            { id: 38, q: "I ______ my car at home and go for a walk.", options: ["leave", "bad", "food"], ans: "leave", exp: "'leave my car at home' (để xe ô tô ở nhà). Dịch: Tôi để xe ở nhà và đi dạo." },
+            { id: 39, q: "There is a girl living with me, I met her for the ______ time.", options: ["very", "first", "one"], ans: "first", exp: "Cụm 'for the first time' (lần đầu tiên)." },
+            { id: 40, q: "I ______ the office.", options: ["go", "leave", "return"], ans: "leave", exp: "'leave the office' (rời khỏi văn phòng). 'go' và 'return' cần giới từ 'to'." },
+            { id: 41, q: "After ______ so hard, I need a rest.", options: ["working", "sleeping", "eating"], ans: "working", exp: "'working so hard' (làm việc rất chăm chỉ/vất vả). Dịch: Sau khi làm việc vất vả, tôi cần nghỉ ngơi." },
+            { id: 42, q: "Can you be ______ before 7pm?", options: ["early", "sleepy", "ready"], ans: "ready", exp: "'be ready' (sẵn sàng). Dịch: Bạn có thể chuẩn bị sẵn sàng trước 7 giờ tối không?" },
+            { id: 43, q: "I am going to wear it ______ my birthday party.", options: ["to", "on", "at"], ans: "to", exp: "Đáp án theo tài liệu gốc: 'wear it to my birthday party' (mặc nó đến bữa tiệc sinh nhật của tôi)." },
+            { id: 44, q: "We eat dinner ______ we go to church.", options: ["after", "then", "before"], ans: "before", exp: "Đáp án chuẩn trong tài liệu gốc: 'before' (Chúng tôi ăn tối trước khi đi nhà thờ)." },
+            { id: 45, q: "I am ______ with my work.", options: ["busy", "table", "round"], ans: "busy", exp: "Cấu trúc 'busy with...' (bận rộn với công việc)." },
+            { id: 46, q: "We are in the same ______.", options: ["door", "class", "chair"], ans: "class", exp: "'in the same class' (học cùng một lớp)." },
+            { id: 47, q: "I ______ it will help clarify the issue.", options: ["sure", "assure", "think"], ans: "think", exp: "'I think...' (Tôi nghĩ rằng nó sẽ giúp làm sáng tỏ vấn đề). 'sure' cần động từ to-be 'am'." },
+            { id: 48, q: "The children are ______ to me.", options: ["noisy", "shy", "friendly"], ans: "friendly", exp: "Cấu trúc 'friendly to somebody' (thân thiện với ai đó)." },
+            { id: 49, q: "This exercise is not difficult. It is quite ______.", options: ["easy", "angry", "empty"], ans: "easy", exp: "'not difficult' = 'easy' (dễ dàng)." },
+            { id: 50, q: "I feel ______ after cycling to work.", options: ["big", "good", "beautiful"], ans: "good", exp: "'feel good' (cảm thấy khỏe/tốt sau khi đạp xe đi làm)." },
+            { id: 51, q: "I cook eggs for a quick ______.", options: ["dinner", "homework", "sore"], ans: "dinner", exp: "'a quick dinner' (một bữa tối nhanh gọn)." },
+            { id: 52, q: "I buy some food at the ______.", options: ["classroom", "park", "market"], ans: "market", exp: "Mua thức ăn ở chợ: 'at the market'." },
+            { id: 53, q: "Exercise is ______ for my body.", options: ["leave", "good", "early"], ans: "good", exp: "Cấu trúc 'good for...' (tốt cho cơ thể)." },
+            { id: 54, q: "She is from France and she can ______ 5 languages.", options: ["talk", "say", "speak"], ans: "speak", exp: "Nói một ngôn ngữ dùng động từ 'speak' (speak 5 languages)." },
+            { id: 55, q: "I go home in my new ______.", options: ["bag", "jeans", "car"], ans: "car", exp: "'go home in my new car' (về nhà bằng chiếc ô tô mới của tôi)." },
+            { id: 56, q: "I hope to ______ your letter.", options: ["tell", "read", "forward"], ans: "read", exp: "'read your letter' (đọc lá thư của bạn)." },
+            { id: 57, q: "I can ______ you at your place then.", options: ["hold", "meet", "miss"], ans: "meet", exp: "'meet you at your place' (gặp bạn tại chỗ của bạn)." },
+            { id: 58, q: "Please read the information ______ so we don't miss any details.", options: ["beautifully", "fluently", "slowly"], ans: "slowly", exp: "'read slowly' (đọc chậm rãi để không bỏ sót chi tiết nào)." },
+            { id: 59, q: "I will save you ______ cake.", options: ["many", "none", "some"], ans: "some", exp: "'some cake' (để phần cho bạn một ít bánh). 'many' chỉ đi với danh từ đếm được số nhiều." },
+            { id: 60, q: "I always ______ dinner for myself.", options: ["cook", "drink", "breathe"], ans: "cook", exp: "'cook dinner' (nấu bữa tối)." },
+            { id: 61, q: "We are going to ______ around.", options: ["drive", "see", "talk"], ans: "drive", exp: "'drive around' (lái xe đi dạo vòng quanh)." },
+            { id: 62, q: "I will have meetings with my ______.", options: ["neighbor", "wife", "client"], ans: "client", exp: "'meetings with my client' (họp với khách hàng của tôi)." },
+            { id: 63, q: "We ______ to work.", options: ["drive", "smile", "say"], ans: "drive", exp: "'drive to work' (lái xe đi làm)." },
+            { id: 64, q: "After ______ so hard.", options: ["working", "sleeping", "eating"], ans: "working", exp: "'After working so hard' (Sau khi làm việc rất vất vả)." },
+            { id: 65, q: "Seamus and Agnes ______ speaking English with me.", options: ["practise", "forget", "avoid"], ans: "practise", exp: "Đáp án chuẩn theo key: 'practise speaking English' (luyện nói tiếng Anh với tôi)." },
+            { id: 66, q: "We arrived early, ______ we had time for a coffee.", options: ["so", "but", "if"], ans: "so", exp: "'so' (vì vậy). Dịch: Chúng tôi đến sớm, vì vậy chúng tôi có thời gian uống cà phê." },
+            { id: 67, q: "When you are at the train ______, go to the main gate.", options: ["school", "station", "river"], ans: "station", exp: "'train station' (nhà ga xe lửa)." },
+            { id: 68, q: "After dinner, we will watch ______ on TV.", options: ["sing", "movies", "news"], ans: "movies", exp: "Đáp án theo tài liệu gốc: 'movies' (xem phim trên TV)." },
+            { id: 69, q: "Late ______.", options: ["watch", "door", "cake"], ans: "cake", exp: "Câu rút gọn trong đề gốc Aptis (Câu 69): đáp án được gạch chân là 'cake'." },
+            { id: 70, q: "I hate the food, ______ yesterday I ate out.", options: ["then", "so", "also"], ans: "so", exp: "'so' (vì vậy). Dịch: Tôi ghét đồ ăn ở đó, vì vậy hôm qua tôi đã đi ăn ngoài." },
+            { id: 71, q: "I usually drink a lot of water and eat healthy ______.", options: ["watch", "meal", "food"], ans: "food", exp: "'eat healthy food' (ăn thực phẩm lành mạnh). 'meal' là danh từ đếm được nên phải có a/s." },
+            { id: 72, q: "We eat dinner ______. Love,", options: ["toward", "together", "another"], ans: "together", exp: "'eat dinner together' (ăn tối cùng nhau)." },
+            { id: 73, q: "I go to bed when I feel ______.", options: ["sleepy", "angry", "alert"], ans: "sleepy", exp: "'feel sleepy' (cảm thấy buồn ngủ)." },
+            { id: 74, q: "Don't have too much ______ because we're going to eat cake.", options: ["talk", "pencil", "dinner"], ans: "dinner", exp: "'too much dinner' (đừng ăn tối quá nhiều vì chúng ta sẽ ăn bánh ngọt)." },
+            { id: 75, q: "______ My love to everyone.", options: ["Give", "Hold", "Receive"], ans: "Give", exp: "Cụm kết thư: 'Give my love to everyone' (Gửi lời hỏi thăm/yêu thương của tôi tới mọi người)." },
+            { id: 76, q: "It is a ______ day.", options: ["long", "details", "copy"], ans: "long", exp: "'a long day' (một ngày dài)." },
+            { id: 77, q: "We like to ______ dinner.", options: ["hold", "cook", "melt"], ans: "cook", exp: "'cook dinner' (nấu bữa tối)." },
+            { id: 78, q: "We eat dinner ______.", options: ["toward", "together", "another"], ans: "together", exp: "'eat dinner together' (ăn tối cùng nhau)." },
+            { id: 79, q: "Also, send me the results ______ you go home, not after.", options: ["when", "before", "between"], ans: "before", exp: "Có gợi ý 'not after' (không phải sau đó) -> chọn 'before' (trước khi bạn về nhà)." },
+            { id: 80, q: "I do not like the food here, ______ yesterday I ate out.", options: ["so", "but", "unless"], ans: "so", exp: "'so' (cho nên/vì thế hôm qua tôi ăn ở ngoài)." },
+            { id: 81, q: "Please write your name at the top of the ______.", options: ["page", "window", "garden"], ans: "page", exp: "'at the top of the page' (ở đầu trang giấy)." },
+            { id: 82, q: "After you come, we will have ______.", options: ["dinner", "food", "eat"], ans: "dinner", exp: "'have dinner' (ăn tối)." },
+            { id: 83, q: "In the evening, we can watch some ______ together.", options: ["animals", "films", "bread"], ans: "films", exp: "'watch some films' (xem vài bộ phim cùng nhau)." },
+            { id: 84, q: "We are ______ in a small house in the village.", options: ["staying", "garden", "children", "visit", "old"], ans: "staying", exp: "Sau 'are' cần V-ing: 'staying' (Chúng tôi đang ở tại một ngôi nhà nhỏ trong làng)." },
+            { id: 85, q: "There are a lot of trees in the ______.", options: ["staying", "garden", "children", "visit", "old"], ans: "garden", exp: "'in the garden' (có nhiều cây trong khu vườn)." },
+            { id: 86, q: "We go out with our ______.", options: ["staying", "garden", "children", "visit", "old"], ans: "children", exp: "'with our children' (đi chơi cùng với các con của chúng tôi)." },
+            { id: 87, q: "Today, we are going to ______ the town by bus.", options: ["staying", "garden", "children", "visit", "old"], ans: "visit", exp: "Sau 'going to' cần V nguyên mẫu: 'visit the town' (thăm thị trấn)." },
+            { id: 88, q: "There are some ______ buildings there.", options: ["staying", "garden", "children", "visit", "old"], ans: "old", exp: "Trước danh từ 'buildings' cần tính từ: 'old buildings' (những tòa nhà cổ/cũ)." },
+            { id: 89, q: "I ______ the area where I live now.", options: ["love", "run", "should"], ans: "love", exp: "'love the area' (Tôi yêu khu vực nơi tôi đang sống)." },
+            { id: 90, q: "My house has a kitchen but it is very ______.", options: ["small", "tall", "short"], ans: "small", exp: "Mô tả căn bếp: 'very small' (rất nhỏ)." },
+            { id: 91, q: "I wear a ______ shirt.", options: ["blue", "tall", "quickly"], ans: "blue", exp: "'a blue shirt' (một chiếc áo sơ mi màu xanh)." },
+            { id: 92, q: "Every day I talk to many ______.", options: ["animals", "trees", "people"], ans: "people", exp: "'talk to many people' (nói chuyện với nhiều người)." },
+            { id: 93, q: "I am on my holiday and I am excited that I can ______ you soon.", options: ["show", "visit", "play"], ans: "visit", exp: "'visit you soon' (sớm đến thăm bạn)." },
+            { id: 94, q: "Please close the ______ before you leave the room.", options: ["window", "weather", "street"], ans: "window", exp: "'close the window' (đóng cửa sổ trước khi rời phòng)." },
+            { id: 95, q: "I usually ______ breakfast at seven o'clock.", options: ["make", "have", "take"], ans: "have", exp: "Cụm cố định: 'have breakfast' (ăn sáng)." },
+            { id: 96, q: "My brother works in a large ______ near the airport.", options: ["lesson", "garden", "company"], ans: "company", exp: "'works in a large company' (làm việc trong một công ty lớn)." },
+            { id: 97, q: "She is waiting ______ the bus.", options: ["for", "from", "with"], ans: "for", exp: "Cụm động từ: 'wait for' (chờ đợi xe buýt)." },
+            { id: 98, q: "We need to buy some ______ for dinner.", options: ["sleep", "food", "homework"], ans: "food", exp: "'buy some food' (mua một ít thức ăn cho bữa tối)." },
+            { id: 99, q: "The train leaves at half ______ eight.", options: ["after", "behind", "past"], ans: "past", exp: "Giờ rưỡi: 'half past eight' (8 giờ 30 phút)." },
+            { id: 100, q: "Could you ______ me your phone number?", options: ["tell", "speak", "talk"], ans: "tell", exp: "'tell me your phone number' (cho tôi biết số điện thoại của bạn). 'speak/talk' không đi trực tiếp với tân ngữ 'me'." },
+            { id: 101, q: "My parents live in a small ______.", options: ["meeting", "village", "office"], ans: "village", exp: "'live in a small village' (sống ở một ngôi làng nhỏ)." },
+            { id: 102, q: "I always ______ my teeth before going to bed.", options: ["wash", "cleaning", "brush"], ans: "brush", exp: "Cụm cố định: 'brush my teeth' (đánh răng)." },
+            { id: 103, q: "The shop is ______ on Sundays.", options: ["closed", "heavy", "slow"], ans: "closed", exp: "'closed on Sundays' (đóng cửa vào các ngày Chủ nhật)." },
+            { id: 104, q: "We walked home because we ______ the last bus.", options: ["lost", "missed", "forgot"], ans: "missed", exp: "Lỡ chuyến xe buýt dùng động từ 'miss' -> 'missed the last bus'." },
+            { id: 105, q: "The manager will ______ the results tomorrow.", options: ["grow", "wear", "check"], ans: "check", exp: "'check the results' (kiểm tra kết quả)." },
+            { id: 106, q: "Please put your books on the ______.", options: ["table", "flooring", "light"], ans: "table", exp: "'on the table' (đặt sách của bạn lên bàn)." },
+            { id: 107, q: "I need to ______ an appointment with the doctor.", options: ["do", "make", "build"], ans: "make", exp: "Cụm cố định (collocation): 'make an appointment' (đặt lịch hẹn)." },
+            { id: 108, q: "She wore a warm coat because it was ______ outside.", options: ["hungry", "quiet", "cold"], ans: "cold", exp: "Mặc áo ấm vì bên ngoài trời lạnh ('cold outside')." },
+            { id: 109, q: "My sister is very good ______ maths.", options: ["at", "on", "for"], ans: "at", exp: "Cấu trúc 'good at something' (giỏi về môn gì)." },
+            { id: 110, q: "We are planning to ______ a new computer.", options: ["pay", "buy", "spend"], ans: "buy", exp: "'buy a new computer' (mua một chiếc máy tính mới). 'pay' cần giới từ 'for'." },
+            { id: 111, q: "The teacher asked us to work in ______.", options: ["pages", "letters", "pairs"], ans: "pairs", exp: "Cụm 'work in pairs' (làm việc theo cặp)." },
+            { id: 112, q: "I cannot hear you. Please speak more ______.", options: ["clearly", "carefully", "quietly"], ans: "clearly", exp: "'speak more clearly' (nói rõ ràng hơn)." },
+            { id: 113, q: "He arrived late because the traffic was very ______.", options: ["strong", "heavy", "full"], ans: "heavy", exp: "Giao thông đông đúc/tắc nghẽn dùng 'heavy traffic'." },
+            { id: 114, q: "Would you like a cup ______ coffee?", options: ["from", "with", "of"], ans: "of", exp: "'a cup of coffee' (một tách cà phê)." },
+            { id: 115, q: "My phone battery is almost ______.", options: ["empty", "free", "quiet"], ans: "empty", exp: "Pin điện thoại gần cạn/hết: 'almost empty'." },
+            { id: 116, q: "I usually ______ the news before work.", options: ["look", "read", "watching"], ans: "read", exp: "'read the news' (đọc tin tức). 'look' cần 'at', 'watching' sai ngữ pháp sau 'usually'." },
+            { id: 117, q: "Please ______ your shoes before entering the house.", options: ["turn off", "get off", "take off"], ans: "take off", exp: "Cụm động từ 'take off' (cởi giày/quần áo)." },
+            { id: 118, q: "The restaurant was busy, but we found a ______.", options: ["table", "kitchen", "meal"], ans: "table", exp: "'found a table' (tìm được một cái bàn trống trong nhà hàng)." },
+            { id: 119, q: "I forgot to bring my umbrella, ______ I got wet.", options: ["but", "so", "because"], ans: "so", exp: "'so' (vì vậy tôi bị ướt)." },
+            { id: 120, q: "My neighbour has a very friendly ______.", options: ["road", "weather", "dog"], ans: "dog", exp: "'a very friendly dog' (một chú chó rất thân thiện)." },
+            { id: 121, q: "We need more information before making a ______.", options: ["decision", "question", "conversation"], ans: "decision", exp: "Cụm cố định: 'make a decision' (đưa ra quyết định)." },
+            { id: 122, q: "I will call you when I ______ home.", options: ["go to", "get", "arrive to"], ans: "get", exp: "Cụm 'get home' (về đến nhà). 'home' là trạng từ nên không dùng giới từ 'to'." },
+            { id: 123, q: "Can you help me ______ this box upstairs?", options: ["wear", "follow", "carry"], ans: "carry", exp: "'carry this box' (mang/bê chiếc hộp này lên lầu)." },
+            { id: 124, q: "The supermarket is ______ the bank and the post office.", options: ["between", "through", "during"], ans: "between", exp: "Cấu trúc 'between A and B' (ở giữa ngân hàng và bưu điện)." },
+            { id: 125, q: "She always ______ notes during the lesson.", options: ["makes", "takes", "writes down to"], ans: "takes", exp: "Đáp án theo tài liệu gốc: 'takes notes' (ghi chép bài)." },
+            { id: 126, q: "I am looking ______ my keys.", options: ["at", "from", "for"], ans: "for", exp: "'look for' (tìm kiếm chìa khóa)." },
+            { id: 127, q: "Please turn ______ the lights before you leave.", options: ["off", "over", "away"], ans: "off", exp: "'turn off the lights' (tắt đèn)." },
+            { id: 128, q: "We had a great ______ at the beach.", options: ["clock", "time", "hour"], ans: "time", exp: "Cụm 'have a great time' (có một khoảng thời gian tuyệt vời)." },
+            { id: 129, q: "My father usually ______ to work by car.", options: ["rides", "walks on", "drives"], ans: "drives", exp: "Đi bằng ô tô dùng 'drives' (lái xe đi làm)." },
+            { id: 130, q: "The soup is too ______ to eat now.", options: ["hot", "fast", "deep"], ans: "hot", exp: "'too hot to eat' (quá nóng để ăn ngay bây giờ)." },
+            { id: 131, q: "I need to ______ some money from the bank.", options: ["remove", "withdraw", "carry"], ans: "withdraw", exp: "Rút tiền từ ngân hàng dùng thuật ngữ 'withdraw'." },
+            { id: 132, q: "The film starts ______ eight o'clock.", options: ["in", "on", "at"], ans: "at", exp: "Trước giờ giấc cụ thể dùng giới từ 'at' (at eight o'clock)." },
+            { id: 133, q: "She was tired, ______ she went to bed early.", options: ["so", "but", "or"], ans: "so", exp: "'so' (vì vậy cô ấy đi ngủ sớm)." },
+            { id: 134, q: "Could you ______ the door, please?", options: ["start", "open", "begin"], ans: "open", exp: "'open the door' (mở cửa)." },
+            { id: 135, q: "I have lived here ______ three years.", options: ["since", "from", "for"], ans: "for", exp: "Trước một khoảng thời gian (three years) dùng giới từ 'for'." },
+            { id: 136, q: "We usually have lunch in the office ______.", options: ["canteen", "bedroom", "garage"], ans: "canteen", exp: "'office canteen' (căng-tin văn phòng)." },
+            { id: 137, q: "My train was late, so I missed the ______.", options: ["weather", "meeting", "street"], ans: "meeting", exp: "'missed the meeting' (bị lỡ cuộc họp)." },
+            { id: 138, q: "Please ______ your answer on the form.", options: ["draw", "speak", "write"], ans: "write", exp: "'write your answer' (viết câu trả lời của bạn vào biểu mẫu)." },
+            { id: 139, q: "The hotel room was clean and ______.", options: ["comfortable", "hungry", "angry"], ans: "comfortable", exp: "'clean and comfortable' (sạch sẽ và thoải mái)." },
+            { id: 140, q: "I need a new ______ because mine is broken.", options: ["rain", "phone", "music"], ans: "phone", exp: "'a new phone' (cần một chiếc điện thoại mới vì cái của tôi bị hỏng)." },
+            { id: 141, q: "She ______ her homework before dinner.", options: ["closed", "stopped at", "finished"], ans: "finished", exp: "'finished her homework' (hoàn thành bài tập về nhà)." },
+            { id: 142, q: "We are going to ______ our grandparents this weekend.", options: ["visit", "watch", "look"], ans: "visit", exp: "'visit our grandparents' (thăm ông bà của chúng tôi)." },
+            { id: 143, q: "Please be quiet. The baby is ______.", options: ["running", "sleeping", "driving"], ans: "sleeping", exp: "'The baby is sleeping' (Hãy giữ yên lặng. Em bé đang ngủ)." }
+        ];
+
+        // STATE QUẢN LÝ HỌC TẬP & SPACED REPETITION
+        let state = {
+            mastered: [],      // Danh sách ID câu đã làm đúng
+            wrongHistory: [],  // Danh sách ID câu từng làm sai (để lọc ôn riêng)
+            queue: [],         // Hàng đợi câu hỏi hiện tại
+            autoAudio: true,
+            wrongOnlyMode: false,
+            secondsElapsed: 0
+        };
+
+        let currentItem = null; // { id, isRetry }
+        let answered = false;
+
+        // KHỞI TẠO APP
+        window.onload = () => {
+            loadState();
+            buildQueue();
+            startTimer();
+            loadNextFromQueue();
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('aptis_p1_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.mastered = parsed.mastered || [];
+                    state.wrongHistory = parsed.wrongHistory || [];
+                    state.autoAudio = parsed.autoAudio !== undefined ? parsed.autoAudio : true;
+                    updateAudioBtnUI();
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('aptis_p1_state', JSON.stringify({
+                mastered: state.mastered,
+                wrongHistory: state.wrongHistory,
+                autoAudio: state.autoAudio
+            }));
+            updateStatsUI();
+        }
+
+        function buildQueue() {
+            state.queue = [];
+            if (state.wrongOnlyMode) {
+                // Chỉ lấy các câu nằm trong wrongHistory
+                state.queue = state.wrongHistory.map(id => ({ id, isRetry: true }));
+            } else {
+                // Ưu tiên các câu chưa thuộc lên trước, câu thuộc rồi để cuối
+                const unmastered = QUESTIONS_DB.filter(q => !state.mastered.includes(q.id)).map(q => ({ id: q.id, isRetry: false }));
+                const mastered = QUESTIONS_DB.filter(q => state.mastered.includes(q.id)).map(q => ({ id: q.id, isRetry: false }));
+                state.queue = [...unmastered, ...mastered];
+            }
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            const total = QUESTIONS_DB.length;
+            const masteredLen = state.mastered.length;
+            document.getElementById('mastered-count').innerText = masteredLen;
+            document.getElementById('queue-count').innerText = state.queue.length;
+            document.getElementById('wrong-count').innerText = state.wrongHistory.length;
+            
+            const percent = Math.round((masteredLen / total) * 100);
+            document.getElementById('progress-fill').style.width = `${percent}%`;
+        }
+
+        // HIỂN THỊ CÂU HỎI
+        function loadNextFromQueue() {
+            answered = false;
+            document.getElementById('feedback-card').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+
+            if (state.queue.length === 0) {
+                if (state.wrongOnlyMode) {
+                    alert("Tuyệt vời! Bạn đã ôn hết các câu làm sai. Chuyển về chế độ toàn bộ đề.");
+                    toggleWrongOnlyMode();
+                    return;
+                } else {
+                    alert("Chúc mừng! Bạn đã hoàn thành toàn bộ lượt học. Hàng đợi sẽ được làm mới.");
+                    buildQueue();
+                }
+            }
+
+            currentItem = state.queue.shift();
+            const qObj = QUESTIONS_DB.find(q => q.id === currentItem.id);
+
+            document.getElementById('q-number').innerText = `Câu ${qObj.id}/143`;
+            document.getElementById('sr-tag').style.display = currentItem.isRetry ? 'inline-block' : 'none';
+            
+            // Format hiển thị chỗ trống
+            const formattedQ = qObj.q.replace("______", `<span class="blank-highlight" id="blank-word">______</span>`);
+            document.getElementById('q-text').innerHTML = formattedQ;
+
+            // Render các lựa chọn
+            const optionsContainer = document.getElementById('options-list');
+            optionsContainer.innerHTML = '';
+            const labels = ['A', 'B', 'C', 'D', 'E'];
+
+            qObj.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span>${labels[idx]}. ${opt}</span> <span class="opt-icon"></span>`;
+                btn.onclick = () => selectAnswer(opt, btn, qObj);
+                optionsContainer.appendChild(btn);
+            });
+
+            updateStatsUI();
+        }
+
+        // XỬ LÝ KHI CHỌN ĐÁP ÁN (PHẢN HỒI TỨC THÌ + SPACED REPETITION)
+        function selectAnswer(selectedOpt, btnElement, qObj) {
+            if (answered) return;
+            answered = true;
+
+            const isCorrect = (selectedOpt === qObj.ans);
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            // Điền từ đúng vào chỗ trống trên câu hỏi
+            const blankEl = document.getElementById('blank-word');
+            if (blankEl) {
+                blankEl.innerText = qObj.ans;
+                blankEl.style.color = isCorrect ? 'var(--correct)' : 'var(--wrong)';
+            }
+
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                const text = btn.querySelector('span').innerText.substring(3); // Bỏ 'A. '
+                if (text === qObj.ans) {
+                    btn.classList.add('correct');
+                    btn.querySelector('.opt-icon').innerText = '✓';
+                }
+            });
+
+            const fbCard = document.getElementById('feedback-card');
+            const fbTitle = document.getElementById('feedback-title');
+            const fbExp = document.getElementById('feedback-exp');
+
+            if (isCorrect) {
+                // ĐÚNG: Đánh dấu đã thuộc
+                if (!state.mastered.includes(qObj.id)) {
+                    state.mastered.push(qObj.id);
+                }
+                // Nếu đang ở chế độ ôn câu sai và làm đúng -> xóa khỏi danh sách sai
+                if (state.wrongOnlyMode) {
+                    state.wrongHistory = state.wrongHistory.filter(id => id !== qObj.id);
+                }
+
+                fbCard.style.borderLeftColor = 'var(--correct)';
+                fbTitle.style.color = 'var(--correct)';
+                fbTitle.innerHTML = `✅ Chính xác!`;
+            } else {
+                // SAI: Tô đỏ nút chọn + Thuật toán Spaced Repetition
+                btnElement.classList.add('wrong');
+                btnElement.querySelector('.opt-icon').innerText = '✕';
+
+                // Bỏ khỏi danh sách đã thuộc nếu trước đó từng thuộc
+                state.mastered = state.mastered.filter(id => id !== qObj.id);
+                if (!state.wrongHistory.includes(qObj.id)) {
+                    state.wrongHistory.push(qObj.id);
+                }
+
+                // CHÈN LẠI VÀO HÀNG ĐỢI SAU 3-4 CÂU (SPACED REPETITION)
+                const reinsertIndex = Math.min(3, state.queue.length);
+                state.queue.splice(reinsertIndex, 0, { id: qObj.id, isRetry: true });
+
+                fbCard.style.borderLeftColor = 'var(--wrong)';
+                fbTitle.style.color = 'var(--wrong)';
+                fbTitle.innerHTML = `❌ Sai rồi! Đáp án đúng là: "${qObj.ans}" (Sẽ hỏi lại sau ít phút)`;
+            }
+
+            fbExp.innerText = qObj.exp;
+            fbCard.style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+
+            saveState();
+
+            // Tự động đọc câu hoàn chỉnh bằng Web Speech API
+            if (state.autoAudio) {
+                speakFullSentence(qObj);
+            }
+        }
+
+        function nextQuestion() {
+            loadNextFromQueue();
+        }
+
+        // HỖ TRỢ ÂM THANH (WEB SPEECH API)
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel(); // Dừng âm thanh đang đọc dở
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-GB'; // Chuẩn giọng Anh - Anh của kỳ thi Aptis British Council
+            utterance.rate = 0.95;    // Tốc độ vừa phải, rõ chữ
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function speakFullSentence(qObj) {
+            const fullSentence = qObj.q.replace("______", qObj.ans);
+            speakText(fullSentence);
+        }
+
+        function speakCurrentQuestion() {
+            if (!currentItem) return;
+            const qObj = QUESTIONS_DB.find(q => q.id === currentItem.id);
+            if (answered) {
+                speakFullSentence(qObj);
+            } else {
+                // Nếu chưa trả lời, đọc câu hỏi (thay dấu gạch bằng từ "blank")
+                const readQ = qObj.q.replace("______", "blank");
+                speakText(readQ);
+            }
+        }
+
+        function toggleAutoAudio() {
+            state.autoAudio = !state.autoAudio;
+            updateAudioBtnUI();
+            saveState();
+        }
+
+        function updateAudioBtnUI() {
+            const btn = document.getElementById('btn-auto-audio');
+            if (state.autoAudio) {
+                btn.classList.add('active');
+                btn.innerText = "🔊 Tự đọc: BẬT";
+            } else {
+                btn.classList.remove('active');
+                btn.innerText = "🔇 Tự đọc: TẮT";
+            }
+        }
+
+        // CHẾ ĐỘ LỌC CÂU SAI & MODAL DANH SÁCH
+        function toggleWrongOnlyMode() {
+            if (!state.wrongOnlyMode && state.wrongHistory.length === 0) {
+                alert("Bạn chưa có câu nào làm sai trong lịch sử để ôn tập!");
+                return;
+            }
+            state.wrongOnlyMode = !state.wrongOnlyMode;
+            const btn = document.getElementById('btn-filter-wrong');
+            if (state.wrongOnlyMode) {
+                btn.classList.add('active');
+                btn.innerText = "🔄 Đang ôn câu sai";
+            } else {
+                btn.classList.remove('active');
+                btn.innerText = "🔄 Ôn câu sai";
+            }
+            buildQueue();
+            loadNextFromQueue();
+        }
+
+        function openListModal() {
+            const grid = document.getElementById('modal-grid');
+            grid.innerHTML = '';
+            QUESTIONS_DB.forEach(q => {
+                const btn = document.createElement('button');
+                btn.className = 'q-grid-btn';
+                if (state.mastered.includes(q.id)) btn.classList.add('mastered');
+                else if (state.wrongHistory.includes(q.id)) btn.classList.add('wrong-hist');
+                
+                btn.innerText = q.id;
+                btn.onclick = () => jumpToQuestion(q.id);
+                grid.appendChild(btn);
+            });
+            document.getElementById('list-modal').style.display = 'flex';
+        }
+
+        function closeListModal() {
+            document.getElementById('list-modal').style.display = 'none';
+        }
+
+        function jumpToQuestion(id) {
+            closeListModal();
+            // Đưa câu được chọn lên đầu hàng đợi
+            state.queue = state.queue.filter(item => item.id !== id);
+            state.queue.unshift({ id: id, isRetry: false });
+            loadNextFromQueue();
+        }
+
+        function resetProgress() {
+            if (confirm("Bạn có chắc muốn xóa toàn bộ tiến độ để học lại từ đầu không?")) {
+                state.mastered = [];
+                state.wrongHistory = [];
+                state.wrongOnlyMode = false;
+                document.getElementById('btn-filter-wrong').classList.remove('active');
+                saveState();
+                buildQueue();
+                loadNextFromQueue();
+            }
+        }
+
+        // ĐỒNG HỒ BẤM GIỜ LUYỆN TẬP
+        function startTimer() {
+            setInterval(() => {
+                state.secondsElapsed++;
+                const mins = String(Math.floor(state.secondsElapsed / 60)).padStart(2, '0');
+                const secs = String(state.secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
